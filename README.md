@@ -1,48 +1,64 @@
-# Network Diagnostic Toolkit (netdiag) v1.0
+# netdiag: Network Diagnostic Toolkit
 
-A Python toolkit for diagnosing network problems and learning the concepts behind each result.
-Standard library only. Python 3.8+. No installation needed.
+A Python command-line toolkit that finds out *what is wrong* with a network connection and explains the
+networking concept behind each result. Standard library only, so there is nothing to install but Python 3.8+.
 
-## Quick start
+`netdiag diag <host>` runs every check in one go and finishes with a plain-language list of problems.
+
+![diag terminal output](docs/diag-terminal.png)
+
+## Features
+
+- **One-command diagnosis** of DNS, latency, HTTPS and open ports, with an HTML or JSON report
+- **Hand-built DNS client** (UDP with TCP fallback, name compression) that can query specific resolvers and compare them
+- **TCP latency, packet loss and jitter** with no admin rights, plus a live `monitor` mode
+- **HTTPS timing breakdown**: DNS, TCP connect, TLS handshake and first byte, plus certificate expiry
+- **Threaded port scanner** that tells open, closed and filtered ports apart
+- **Local network info**: IP, default gateway and DNS servers (Windows, macOS, Linux)
+
+![HTML report](docs/report.png)
+
+## Install
 
 ```bash
-python -m netdiag diag example.com --html report.html   # run everything, get findings + HTML report
+git clone https://github.com/<your-username>/netdiag.git
+cd netdiag
+pip install -e .          # gives you the `netdiag` command
 ```
 
-Optional: `pip install .` gives you a plain `netdiag` command (`netdiag diag example.com`).
+No install is needed to try it: `python -m netdiag diag example.com` works from the project folder.
 
-## Commands
+On Windows, if `netdiag` is not recognized after installing, pip's Scripts folder is not on your PATH
+(pip prints a warning with its location). Add that folder to PATH and reopen your terminal, or keep using
+`python -m netdiag`.
 
-| Command | Purpose |
-|---------|---------|
-| `diag <host>` | Machine info, DNS, latency, HTTPS and port checks, then a plain-language findings list. `--html FILE` / `--json-file FILE` save reports. |
-| `info` | This machine's IP, default gateway and DNS servers |
-| `ping <host>` | TCP latency, loss, jitter (no admin rights). `--icmp` uses the system ping |
-| `monitor <host>` | Live running loss/latency until Ctrl+C. `-c N` stops after N probes |
-| `dns <name>` | `-t A AAAA MX TXT NS SOA CNAME PTR`; repeat `-s <resolver>` to compare resolvers |
-| `rdns <ip>` | Reverse lookup (IP to hostname) |
-| `scan <host>` | TCP port scan: `-p 22,80,8000-8100`, `--banner` |
-| `http <url>` | DNS / TCP / TLS / first-byte timings, status, certificate days left |
-| `trace <host>` | Route via system traceroute / tracert / tracepath |
+## Usage
 
-`ping`, `dns`, `rdns`, `scan`, `http` and `info` accept `--json`. Exit codes: 0 = ok, 1 = problem found, 2 = bad input.
-
-## How it is organised
-
-```
-netdiag/
-  cli.py          argument parsing, output formatting, the diag workflow
-  tcp_ping.py     TCP handshake timing, loss, jitter
-  dns_tools.py    hand-built DNS client (UDP, TCP fallback, name compression)
-  portscan.py     threaded connect scanner, banner grabbing
-  http_check.py   per-phase HTTP(S) timing, TLS version, cert expiry
-  info.py         local IP, gateway, DNS servers
-  system_tools.py wrappers for system ping / traceroute
-  report.py       self-contained HTML report
-tests/            16 tests (local servers and a fake DNS server; no internet needed)
+```bash
+netdiag diag example.com --html report.html     # everything, with a shareable report
+netdiag info                                    # this machine: IP, gateway, DNS servers
+netdiag ping example.com -c 5                   # TCP latency, loss, jitter
+netdiag monitor 1.1.1.1                         # live loss/latency until Ctrl+C
+netdiag dns example.com -t A MX TXT             # DNS records
+netdiag dns example.com -s 8.8.8.8 -s 1.1.1.1   # compare resolvers
+netdiag rdns 8.8.8.8                            # reverse lookup
+netdiag scan 192.168.1.1 -p 1-1024 --banner     # port scan
+netdiag http https://example.com                # timing breakdown + certificate expiry
+netdiag trace example.com                       # route (system traceroute/tracert)
 ```
 
-Each module returns plain dictionaries and never prints, so a GUI or web front end can reuse them.
+`ping`, `dns`, `rdns`, `scan`, `http` and `info` accept `--json`.
+Exit codes: `0` ok, `1` a problem was found, `2` bad input.
+
+## Which command when
+
+| Situation | Run |
+|-----------|-----|
+| Something is wrong, cause unknown | `netdiag diag <site>` |
+| Is it the site or just me? | `netdiag http <site>` and `netdiag ping <site>` |
+| Pages load slowly | `netdiag dns <site> -s <isp-dns> -s 8.8.8.8`, then `netdiag trace <site>` |
+| Connection drops on and off | `netdiag monitor 1.1.1.1` |
+| Checking what a device exposes | `netdiag scan <your own device>` |
 
 ## What each tool teaches
 
@@ -55,15 +71,41 @@ Each module returns plain dictionaries and never prints, so a GUI or web front e
 | trace | TTL expiry and hop-by-hop path |
 | diag | reading symptoms to find the layer that is failing |
 
+## Project layout
+
+```
+netdiag/
+  cli.py          argument parsing, output formatting, the diag workflow
+  tcp_ping.py     TCP handshake timing, loss, jitter
+  dns_tools.py    hand-built DNS client
+  portscan.py     threaded connect scanner, banner grabbing
+  http_check.py   per-phase HTTP(S) timing, TLS version, certificate expiry
+  info.py         local IP, gateway, DNS servers
+  system_tools.py wrappers for system ping / traceroute
+  report.py       self-contained HTML report
+tests/            17 tests using local servers and a fake DNS server (no internet needed)
+```
+
+Each module returns plain dictionaries and never prints, so a GUI or web front end can reuse them.
+
 ## Tests
 
 ```bash
 python -m unittest discover -s tests -v
 ```
 
-## Limits and notes
-- Only scan systems you own or have permission to test.
-- `trace` and `--icmp` need the system tools installed; the toolkit does not send raw ICMP itself.
-- Port scans are TCP connect scans; "filtered" means no reply, usually a firewall.
-- On Windows, `info` reads the gateway from `ipconfig` and DNS servers fall back to public defaults.
-- Ideas for later: UDP scan, DNSSEC checks, web or terminal UI.
+## Notes and limits
+
+- **Only scan systems you own or have permission to test.**
+- `trace` and `ping --icmp` use the system tools; the toolkit does not send raw ICMP itself.
+- Port scans are TCP connect scans. "Filtered" means no reply, usually a firewall.
+- On Windows the scanner waits at least 2.5 s per port, because Windows is slow to report closed ports.
+- Latency is measured with TCP handshakes, so it reflects what applications experience, not ICMP echo time.
+
+## Roadmap
+
+UDP scanning, DNSSEC checks, and a web or terminal interface.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
