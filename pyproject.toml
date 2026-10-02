@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "netdiag-toolkit"
+version = "1.0.0"
+description = "Network diagnostic toolkit: ping, DNS, port scan, HTTP/TLS timing, reports"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = ["Programming Language :: Python :: 3", "Topic :: System :: Networking"]
+
+[project.scripts]
+netdiag = "netdiag.cli:main"
+
+[tool.setuptools]
+packages = ["netdiag"]
