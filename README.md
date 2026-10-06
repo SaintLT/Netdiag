@@ -10,11 +10,10 @@ Standard library only, so there is nothing to install but Python 3.8+.
 
 ### Diagnostic Terminal Output
 
-![Netdiag diagnostic terminal output](terminal.png)
-
+![Netdiag diagnostic terminal output](Screenshots/terminal.png)
 ### HTML Diagnostic Report
 
-![Netdiag HTML diagnostic report](htmlreport.png)
+![Netdiag HTML diagnostic report](Screenshots/htmlreport.png)
 
 ## Features
 
