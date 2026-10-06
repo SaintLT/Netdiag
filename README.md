@@ -1,11 +1,11 @@
-# netdiag: Network Diagnostic Toolkit
+<img width="1920" height="1080" alt="Screenshot 2026-10-06 145318" src="https://github.com/user-attachments/assets/4bf58c0f-7e8d-431a-945b-b649f1e6cb6f" /># netdiag: Network Diagnostic Toolkit
 
 A Python command-line toolkit that finds out *what is wrong* with a network connection and explains the
 networking concept behind each result. Standard library only, so there is nothing to install but Python 3.8+.
 
 `netdiag diag <host>` runs every check in one go and finishes with a plain-language list of problems.
 
-![diag terminal output](docs/diag-terminal.png)
+![diag terminal output](terminal.png)
 
 ## Features
 
@@ -16,7 +16,7 @@ networking concept behind each result. Standard library only, so there is nothin
 - **Threaded port scanner** that tells open, closed and filtered ports apart
 - **Local network info**: IP, default gateway and DNS servers (Windows, macOS, Linux)
 
-![HTML report](docs/report.png)
+![HTML report](html report.png)
 
 ## Install
 
