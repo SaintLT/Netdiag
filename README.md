@@ -16,7 +16,7 @@ networking concept behind each result. Standard library only, so there is nothin
 - **Threaded port scanner** that tells open, closed and filtered ports apart
 - **Local network info**: IP, default gateway and DNS servers (Windows, macOS, Linux)
 
-![HTML report](htmlreport.png)
+(![HTML report](htmlreport.png)
 
 ## Install
 
