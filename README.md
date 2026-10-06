@@ -5,7 +5,7 @@ networking concept behind each result. Standard library only, so there is nothin
 
 `netdiag diag <host>` runs every check in one go and finishes with a plain-language list of problems.
 
-![diag terminal output](docs/diag-terminal.png)
+![diag terminal output](terminal.png)
 
 ## Features
 
@@ -16,7 +16,7 @@ networking concept behind each result. Standard library only, so there is nothin
 - **Threaded port scanner** that tells open, closed and filtered ports apart
 - **Local network info**: IP, default gateway and DNS servers (Windows, macOS, Linux)
 
-![HTML report](docs/report.png)
+![HTML report](htmlreport.png)
 
 ## Install
 
