@@ -196,4 +196,8 @@ Planned improvements include:
 
 ## License
 
+<<<<<<< HEAD
 MIT License. See [LICENSE](LICENSE).
+=======
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+>>>>>>> d4c7e9c (Add MIT license)
